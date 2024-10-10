@@ -59,62 +59,79 @@ using pq_ = std::priority_queue<T>;
 
 int n;
 int m;
-int a[N];
-int b[N];
-bool st[N];
 
 void solve() {
     cin >> n;
-    rep(i, 1, n) {
-        cin >> a[i];
+    vector<int> a(n + 10);
+    vector<int> b(n + 10);
+    vector<vector<int>> st_a(n + 10, vector<int>(21));
+    vector<vector<int>> st_b(n + 10, vector<int>(21));
+    rep(i, 1, n) cin >> a[i], st_a[i][0] = a[i];
+    rep(i, 1, n) cin >> b[i], st_b[i][0] = b[i];
+    rep(j, 1, 4) {
+        rep(i, 1, n) {
+            st_a[i][j] = std::__gcd(st_a[i][j - 1], st_a[std::min(n + 1, i + (1ll << (j - 1)))][j - 1]);
+            st_b[i][j] = std::__gcd(st_b[i][j - 1], st_b[std::min(n + 1, i + (1ll << (j - 1)))][j - 1]);
+        }
     }
-    rep(i, 1, n) {
-        cin >> b[i];
-    }
+    vector<bool> st(n + 1);
     int gcd = 0;
     rep(i, 1, n) {
-        if (std::__gcd(a[i], gcd) != gcd) {
-            st[i] = true;
-            // st[i + 1] = true;
-        }
+        if (std::__gcd(gcd, a[i]) != gcd) st[i] = true, st[i - 1] = true, st[i + 1] = true;
+        gcd = std::__gcd(gcd, a[i]);
     }
     gcd = 0;
     rep(i, 1, n) {
-        if (std::__gcd(b[i], gcd) != gcd) {
-            st[i] = true;
-            // st[i + 1] = true;
-        }
+        if (std::__gcd(gcd, b[i]) != gcd) st[i] = true, st[i - 1] = true, st[i + 1] = true;
+        gcd = std::__gcd(gcd, b[i]);
     }
     vector<int> v;
     rep(i, 1, n) {
         if (st[i]) v.pb(i);
     }
+    auto ask1 = [&](int l, int r) -> int {
+        int ans = 0;
+        per(j, 20, 0) {
+            if (l + (1ll << j) - 1 <= r) {
+                ans = std::__gcd(ans, st_a[l][j]);
+                l = l + (1ll << j);
+            }
+            if (l > r) break;
+        }
+        return ans;
+    };
+    auto ask2 = [&](int l, int r) -> int {
+        int ans = 0;
+        per(j, 20, 0) {
+            if (l + (1ll << j) - 1 <= r) {
+                ans = std::__gcd(ans, st_b[l][j]);
+                l = l + (1ll << j);
+            }
+            if (l > r) break;
+        }
+        return ans;
+    };
     int ans = 0, num = 0;
     rep(i, 0, v.size() - 1) {
         rep(j, i, v.size() - 1) {
-            rep(k, v[i], v[j]) {
-                std::swap(a[k], b[k]);
-            }
-            // rep(k, 1, n) {
-            //     dbg(a[k]);
+            int c1 = ask1(1, v[i] - 1);
+            int c2 = ask1(v[i], v[j]);
+            int c3 = ask1(v[j] + 1, n);
+            int d1 = ask2(1, v[i] - 1);
+            int d2 = ask2(v[i], v[j]);
+            int d3 = ask2(v[j] + 1, n);
+            int gcd1 = std::__gcd(c1, d2);
+            gcd1 = std::__gcd(gcd1, c3);
+            int gcd2 = std::__gcd(d1, c2);
+            gcd2 = std::__gcd(gcd2, d3);
+            // if (v[i] == 1 && v[j] == 3) {
+            //     print_(d3);
             // }
-            // rep(k, 1, n) {
-            //     dbg(b[k]);
-            // }
-            // dbg("\n");
-            int gcd1 = 0, gcd2 = 0;
-            rep(k, 1, n) {
-                gcd1 = std::__gcd(a[k], gcd1);
-                gcd2 = std::__gcd(b[k], gcd2);
-            }
-            if (gcd1 + gcd2 == ans) num++;
+            if (gcd1 + gcd2 == ans) num ++;
             else if (gcd1 + gcd2 > ans) ans = gcd1 + gcd2, num = 1;
-            rep(k, v[i], v[j]) {
-                std::swap(a[k], b[k]);
-            }
         }
     }
-    std::cout << ans << ' ' << num << '\n';
+    cout << ans << ' ' << num << '\n';
 }
 
 signed main()

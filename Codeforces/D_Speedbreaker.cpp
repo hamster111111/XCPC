@@ -61,11 +61,37 @@ int n;
 int m;
 
 void solve() {
-    int ans = 0;
-    for(int i = 1;i <= 10; ++i) {
-        ans += i;
+    cin >> n;
+    vector<int> a(n + 1);
+    rep(i, 1, n) {
+        cin >> a[i];
     }
-    std::cout << ans << '\n';
+    vector<int> d(n + n + 10);
+    vector<vector<int>> reg(n + 1);
+    rep(i, 1, n) {
+        reg[a[i]].pb(i);
+    }
+    int l = 0, r = -1;
+    rep(i, 1, n) {
+        if (reg[i].size()) {
+            if (r == -1) {
+                l = reg[i][0], r = reg[i].back();
+            } else {
+                l = std::min(l, reg[i][0]), r = std::max(r, reg[i].back());
+            }
+        }
+        if (r == -1) {
+            d[1]++, d[n + 1]--;
+        }
+        else if (r - l + 1 <= i) {
+            int x = i - (r - l + 1);
+            d[std::max(l - x, 1ll)]++, d[r + x + 1]--;
+        }
+    }
+    rep(i, 1, n) d[i] += d[i - 1];
+    int ans = 0;
+    rep(i, 1, n) if (d[i] == n) ans++;
+    cout << ans << '\n';
 }
 
 signed main()
@@ -73,7 +99,7 @@ signed main()
     std::ios::sync_with_stdio(false);
     std::cin.tie(0), std::cout.tie(0);
     int _ = 1;
-    // std::cin >> _;
+    std::cin >> _;
     while (_--) {
         solve();
     }

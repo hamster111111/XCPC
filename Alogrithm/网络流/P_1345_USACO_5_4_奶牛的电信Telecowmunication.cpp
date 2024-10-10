@@ -1,0 +1,150 @@
+#pragma GCC optimize(3, "Ofast", "inline")
+#include<bits/stdc++.h>
+#define int long long
+#define fr first 
+#define sc second 
+#define DEBUG_
+#ifdef DEBUG_
+#define dbg(a) std::cerr << #a << ':' << a << '\n'
+template<class T>
+void print_(T &t) {
+   std::cerr << t << '\n';
+}
+template<class T, class... Args>
+void print_(T &t, Args&... args) {
+   std::cerr << t << ' ';
+   print_(args...);
+}
+#else
+#define dbg(a)
+template<class T>
+void print_(T &t) {
+}
+template<class T, class... Args>
+void print_(T &t, Args&... args) {
+}
+#endif
+#define rep(i, a, b) for(int i = (a);i <= (b); ++i)
+#define per(i, a, b) for(int i = (a);i >= (b); --i)
+#define pb push_back
+#define eb emplace_back
+#define mem(a, b) memset(a, b, sizeof a)
+#define ls(x) (x << 1)
+#define rs(x) (x << 1 | 1)
+#define lowbit(x) (x & -x)
+#define PY puts("YES")
+#define Py puts("Yes")
+#define PN puts("NO")
+#define Pn puts("No")
+#define all(x, l, r) x.begin() + l, x.begin() + r + 1
+//using namespace std;
+const int N = 1e6 + 10;
+const int M = 320;
+const int INF = 1e18 + 10;
+const int mod = 998244353;
+//const int mod = 1e9 + 7;
+const int base1 = 131;
+const int base2 = 13331;
+using PII = std::pair<int, int>;
+using ull = unsigned long long;
+using ll = long long;
+using std::array;
+using std::cin;
+using std::cout;
+using std::vector;
+template <class T>
+using pq_g = std::priority_queue<T, std::vector<T>, std::greater<T>>;
+template <class T>
+using pq_ = std::priority_queue<T>;
+
+int n;
+int m;
+int s;
+int t;
+
+void solve() {
+    cin >> n >> m >> s >> t;
+    struct Node {
+        int to, w, next;
+    };
+    vector<Node> edge(m << 4 | 1);
+    vector<int> head(n << 1 | 1, -1);
+    int idx = 0;
+    auto add = [&](int u, int v, int w) -> void {
+        edge[idx] = {v, w, head[u]};
+        head[u] = idx++;
+    };
+    rep(i, 1, n) {
+        int val = ((i == s || i == t) ? INF : 1);
+        add(i, i + n, val);
+        add(i + n, i, 0);
+    }
+    rep(i, 1, m) {
+        int u, v;
+        cin >> u >> v;
+        add(u + n, v, INF);
+        add(v, u + n, 0);
+        add(v + n, u, INF);
+        add(u, v + n, 0);
+    }
+    s += n;
+    vector<int> deep(n << 1 | 1);
+    vector<int> now(n << 1 | 1);
+    auto bfs = [&]() -> int {
+        rep(i, 1, n << 1) deep[i] = INF;
+        std::queue<int> q;
+        deep[s] = 0;
+        now[s] = head[s];
+        q.push(s);
+        while (!q.empty()) {
+            auto ts = q.front();
+            q.pop();
+            // print_(ts);
+            for(int i = head[ts]; ~i; i = edge[i].next) {
+                int v = edge[i].to;
+                int w = edge[i].w;
+                // print_(ts, v, w);
+                if (w && deep[v] == INF) {
+                // print_(ts, v);
+                    deep[v] = deep[ts] + 1;
+                    now[v] = head[v];
+                    q.push(v);
+                    if (v == t) return 1; 
+                }
+            }
+        }
+        return 0;
+    };
+    auto dfs = [&](auto& self, int u, int sum) -> int {
+        if (u == t) return sum;
+        int flow = 0;
+        for(int i = now[u]; ~i; i = edge[i].next) {
+            int v = edge[i].to;
+            int w = edge[i].w;
+            now[u] = i;
+            if (w > 0 && deep[v] == deep[u] + 1) {
+                int f = self(self, v, std::min(sum, w));
+                edge[i].w -= f;
+                edge[i ^ 1].w += f;
+                flow += f;
+                sum -= f;
+            }
+        }
+        return flow;
+    };
+    int ans = 0;
+    while (bfs()) ans += dfs(dfs, s, INF);
+    // ans = bfs();
+    cout << ans << '\n';
+}
+
+signed main()
+{
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0), std::cout.tie(0);
+    int _ = 1;
+    // std::cin >> _;
+    while (_--) {
+        solve();
+    }
+}
