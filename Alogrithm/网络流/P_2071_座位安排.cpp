@@ -62,78 +62,77 @@ int m;
 struct Node {
     int to, w, next;
 };
-vector<int> head(N, -1);
-vector<Node> edge(N);
-vector<int> now(N);
-vector<int> deep(N);
 
 void solve() {
     cin >> n;
+    vector<Node> edge(n << 4);
+    vector<int> h(n << 2, -1);
     int tot = 0;
     auto add = [&](int u, int v, int w) -> void {
-        edge[tot] = {v, w, head[u]}, head[u] = tot ++;
+        edge[tot] = {v, w, h[u]}, h[u] = tot++;
     };
-    int s = 0, t = n << 2 | 1;
     rep(i, 1, n << 1) {
-        add(s, i, INF);
-        add(i, s, 0);
-        add(i + (n << 1), t, 1);
-        add(t, i + (n << 1), 0);
         int u, v;
         cin >> u >> v;
-        add(i, u + (n << 1), 1);
-        add(u + (n << 1), i, 0);
-
-        add(i, u + (n * 3), 1);
-        add(u + (n * 3), i, 0);
-        
-        add(i, v + (n << 1), 1);
-        add(v + (n << 1), i, 0);
-        
-        add(i, v + (n * 3), 1);
-        add(v + (n * 3), i, 0);
+        add(i, v + (n << 1), 1), add(v + (n << 1), i, 0);
+        add(i, u + (n << 1), 1), add(u + (n << 1), i, 0);
+        add(0, i, 1), add(i, 0, 0);
     }
+    int s = 0, t = 3 * n + 1;
+    rep(i, 1, n) {
+        add(i + (n << 1), t, 2), add(t, i + (n << 1), 0);
+    }
+    vector<int> deep(n << 2);
+    vector<int> now(n << 2);
     auto bfs = [&]() -> int {
-        for(auto& i : deep) i = INF;
-        deep[s] = 0;
-        now[s] = head[s];
         std::queue<int> q;
         q.push(s);
+        for(auto& i : deep) i = INF;
+        deep[s] = 0;
+        now[s] = h[s];
         while (!q.empty()) {
             auto ts = q.front();
             q.pop();
-            for(int i = head[ts]; ~i; i = edge[i].next) {
-                int to = edge[i].to;
-                int w = edge[i].w;
-                if (w && deep[to] == INF) {
-                    deep[to] = deep[ts] + 1;
-                    q.push(to);
-                    now[to] = head[to];
-                    if (to == t) return 1;
-                } 
+            for(int i = h[ts]; ~i; i = edge[i].next) {
+                auto [v, w, ne] = edge[i];
+                if (w && deep[v] == INF) {
+                    // dbg(ts);
+                    // dbg(v);
+                    // dbg(w);
+                    deep[v] = deep[ts] + 1;
+                    now[v] = h[v];
+                    q.push(v);
+                    if (v == t) return 1;
+                }
             }
         }
         return 0;
     };
-    auto dfs = [&](auto& self, int u, int sum) -> int {
-        if (u == t) return sum;
-        int flow = 0;
-        for(int i = now[u]; ~i; i = edge[i].next) {
+    int cnt = 0;
+    auto dfs = [&](auto& self, int p, int sum) -> int {
+        // cnt ++;
+        // if (cnt > 100) return 0;
+        // cout << p << '\n';
+        if (p == t) return sum;
+        int k = 0, flow = 0;
+        for(int i = now[p]; (~i) && sum > 0; i = edge[i].next) {
             auto [v, w, ne] = edge[i];
-            if (w && deep[v] == deep[u] + 1) {
-                int f = self(self, v, std::min(sum, w));
-                flow += f;
-                sum -= f;
-                edge[i].w -= f;
-                edge[i ^ 1].w += f;
-                if (sum == 0) break;
+            now[p] = i;
+            if (w && deep[v] == deep[p] + 1) {
+                k = self(self, v, std::min(sum, w));
+                if (k == 0) deep[v] = INF;
+                edge[i].w -= k;
+                edge[i ^ 1].w += k;
+                flow += k;
+                sum -= k;
             }
         }
         return flow;
     };
     int ans = 0;
-    while (bfs()) ans += dfs(dfs, 0, INF);
-    cout << ans << '\n';
+    while (bfs()) ans += dfs(dfs, s, INF);
+    // if (bfs()) ans += dfs(dfs, s, INF);
+    cout << ans << '\n'; 
 }
 
 signed main()
