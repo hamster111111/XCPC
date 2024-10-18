@@ -61,18 +61,17 @@ int n;
 int m;
 
 void solve() {
-	cin >> n >> m;
-	int x = 1, y = 1;
-	bool flag = true; //这里flag代表是往右上方走还是左下方走
+    int d = 1;
+    printf("%d%d%d",d);
 }
 
 signed main()
 {
-	std::ios::sync_with_stdio(false);
-	std::cin.tie(0), std::cout.tie(0);
-	int _ = 1;
-	// std::cin >> _;
-	while (_--) {
-		solve();
-	}
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0), std::cout.tie(0);
+    int _ = 1;
+    // std::cin >> _;
+    while (_--) {
+        solve();
+    }
 }

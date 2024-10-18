@@ -61,83 +61,16 @@ int n;
 int m;
 
 void solve() {
-    cin >> n;
-    std::string s = "0";
-    if (n == 1) s.clear();
-    auto reply = [&](std::string t, std::string s) -> void {
-        // std::cout << t << ' ' << s << '\n';
-        printf("%s %s\n", t.c_str(), s.c_str());
-        fflush(stdout);
-    };
-    auto answer = []() -> bool {
-        int f;
-        // std::cin >> f;
-        scanf("%lld", &f);
-        // fflush(stdout);
-        return f;
-    };
-    srand(time(0));
-    bool is_new = true;
-    bool is_back = true;
-    int num;
-    int tot = 200;
-    while (tot--) {
-        // std::cout << is_new << '\n';
-        if (is_new) {
-            num = rand() % 2;
-            if (is_back) {
-                s = s + std::to_string(num);
-                reply("?", s);
-                if (!answer()) {
-                    s.pop_back();
-                    is_new = false;
-                }
-            } else {
-                s = std::to_string(num) + s;
-                reply("?", s);
-                if (!answer()) {
-                    s = s.substr(1);
-                    is_new = false;
-                }
-            }
-        } else {
-            num = !num;
-            if (is_back) {
-                s = s + std::to_string(num);
-                reply("?", s);
-                if (!answer()) {
-                    s.pop_back();
-                    is_back = false;
-                    is_new = true;
-                } else {
-                    is_new = true;
-                }
-            } else {
-                s = std::to_string(num) + s;
-                reply("?", s);
-                if (!answer()) {
-                    s.clear();
-                    rep(i, 1, n) s += "1";
-                    reply("!", s);
-                    break;
-                } else {
-                    is_new = true;
-                }
-            }
-        }
-        if(s.size() == n) {
-            reply("!", s);
-            break;
-        }
-    }
+    int d = 1;
+    printf("%dd%d", d);
 }
 
 signed main()
 {
-    // std::ios::sync_with_stdio(false);
-    // std::cin.tie(0), std::cout.tie(0);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0), std::cout.tie(0);
     int _ = 1;
-    std::cin >> _;
+    // std::cin >> _;
     while (_--) {
         solve();
     }

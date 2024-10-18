@@ -1,90 +1,28 @@
-#pragma GCC optimize(3, "Ofast", "inline")
-#include<bits/stdc++.h>
-#define int long long
-#define fr first 
-#define sc second 
-#define DEBUG_
-#ifdef DEBUG_
-#define dbg(a) std::cerr << #a << ':' << a << '\n'
-template<class T>
-void print_(T &t) {
-   std::cerr << t << '\n';
-}
-template<class T, class... Args>
-void print_(T &t, Args&... args) {
-   std::cerr << t << ' ';
-   print_(args...);
-}
-#else
-#define dbg(a)
-template<class T>
-void print_(T &t) {
-}
-template<class T, class... Args>
-void print_(T &t, Args&... args) {
-}
-#endif
-#define rep(i, a, b) for(int i = (a);i <= (b); ++i)
-#define per(i, a, b) for(int i = (a);i >= (b); --i)
-#define pb push_back
-#define eb emplace_back
-#define mem(a, b) memset(a, b, sizeof a)
-#define ls(x) (x << 1)
-#define rs(x) (x << 1 | 1)
-#define lowbit(x) (x & -x)
-#define PY puts("YES")
-#define Py puts("Yes")
-#define PN puts("NO")
-#define Pn puts("No")
-#define all(x, l, r) x.begin() + l, x.begin() + r + 1
-//using namespace std;
-const int N = 1e6 + 10;
-const int M = 320;
-const int INF = 1e18 + 10;
-const int mod = 998244353;
-//const int mod = 1e9 + 7;
-const int base1 = 131;
-const int base2 = 13331;
-using PII = std::pair<int, int>;
-using ull = unsigned long long;
-using ll = long long;
-using std::array;
-using std::cin;
-using std::cout;
-using std::vector;
-template <class T>
-using pq_g = std::priority_queue<T, std::vector<T>, std::greater<T>>;
-template <class T>
-using pq_ = std::priority_queue<T>;
+#include <bits/stdc++.h>
 
-int n;
-int m;
-
-void solve() {
-    cin >> n >> m;
-    vector<vector<vector<int>>> f(n + 1, vector<vector<int>>(6, vector<int>(6)));
-    std::string ss = " narek";
-    rep(i, 1, n) {
-        std::string s;
-        cin >> s;
-        s = " " + s;
-        rep(i, 0, 4) {
-            int l = 0;
-            
-            rep(j, 0, 4) {
-
-            }
-        }
-    } 
-}
-
-signed main()
+int main()
 {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(0), std::cout.tie(0);
-    int _ = 1;
-    // std::cin >> _;
-    while (_--) {
-        solve();
-    }
+    //求解集合大小为n的幂集
+    int n;
+    std::cin >> n;
+    //存储集合以及集合中每个元素的状态
+    std::vector<int> a(n + 1);
+    std::vector<bool> state(n + 1);
+    for(int i = 1; i <= n; i++) std::cin >> a[i];
+    //dfs函数
+    auto dfs = [&](auto self, int layer) -> void {
+        if (layer == n + 1) {
+            //到达n + 1层的时候，我们集合中所有元素的选择状态都处理完了
+            std::cout << "{";
+            for(int i = 1; i <= n; i++) if (state[i]) std::cout << a[i] << ",";
+            std::cout << "}\n";
+            return;
+        }
+        state[layer] = true;//决定选择集合中的这个元素
+        self(self, layer + 1);
+        state[layer] = false;//决定不选择集合中的这个元素
+        self(self, layer + 1);
+    };
+    dfs(dfs, 1);
+    std::next_permutation()
 }

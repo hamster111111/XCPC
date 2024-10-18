@@ -1,98 +1,67 @@
-#pragma GCC optimize(3, "Ofast", "inline")
-#include<bits/stdc++.h>
-#define int long long
-#define fr first 
-#define sc second 
-#define DEBUG_
-#ifdef DEBUG_
-#define dbg(a) std::cerr << #a << ':' << a << '\n'
-template<class T>
-void print_(T &t) {
-   std::cerr << t << '\n';
-}
-template<class T, class... Args>
-void print_(T &t, Args&... args) {
-   std::cerr << t << ' ';
-   print_(args...);
-}
-#else
-#define dbg(a)
-template<class T>
-void print_(T &t) {
-}
-template<class T, class... Args>
-void print_(T &t, Args&... args) {
-}
-#endif
-#define rep(i, a, b) for(int i = (a);i <= (b); ++i)
-#define per(i, a, b) for(int i = (a);i >= (b); --i)
-#define pb push_back
-#define eb emplace_back
-#define mem(a, b) memset(a, b, sizeof a)
-#define ls(x) (x << 1)
-#define rs(x) (x << 1 | 1)
-#define lowbit(x) (x & -x)
-#define PY puts("YES")
-#define Py puts("Yes")
-#define PN puts("NO")
-#define Pn puts("No")
-#define all(x, l, r) x.begin() + l, x.begin() + r + 1
-//using namespace std;
-const int N = 1e6 + 10;
-const int M = 320;
-const int INF = 1e18 + 10;
-const int mod = 998244353;
-//const int mod = 1e9 + 7;
-const int base1 = 131;
-const int base2 = 13331;
-using PII = std::pair<int, int>;
-using ull = unsigned long long;
-using ll = long long;
-using std::array;
-using std::cin;
-using std::cout;
-using std::vector;
-template <class T>
-using pq_g = std::priority_queue<T, std::vector<T>, std::greater<T>>;
-template <class T>
-using pq_ = std::priority_queue<T>;
+#include <bits/stdc++.h>
 
-int n;
-int k;
-int m;
+//抽象类Operator
+class Operator {
+protected:
+    int firstNumber;
+    int secondNumber;
+public:
+    virtual int getResult() = 0;
+    void setFirstNumber(int FirstNumber) {firstNumber = FirstNumber;}
+    int getFirstNumber() {return firstNumber;}
+    void setSecondNumber(int SecondNumber) {secondNumber = SecondNumber;}
+    int getSecondNumber() {return secondNumber;}
+};
 
-void solve() {
-    cin >> n >> m;
-    int max = 0, sum = 0;
-    rep(i, 1, n) {
-        int e; cin >> e;
-        sum += e;
-        max = std::max(max, e);
+class Add : public Operator {
+public:
+    int getResult() override {return firstNumber + secondNumber;}
+};
+
+class Sub : public Operator {
+public:
+    int getResult() override {return firstNumber - secondNumber;}
+};
+
+class Mul : public Operator {
+public:
+    int getResult() override {return firstNumber * secondNumber;}
+};
+
+class Div : public Operator {
+public:
+    int getResult() override {
+        assert(secondNumber != 0);
+        return firstNumber / secondNumber;
     }
-    int ans = 0;
-    rep(i, 1, n) {
-        k = m;
-        int r = (i - (sum % i)) % i;
-        if (k < r) continue;
-        int x = sum / i + ((sum % i) != 0);
-        k -= r;
-        x += k / i;
-        int tot = r + k / i * i;
-        if (x < max) continue;
-        // dbg(tot);
-        if (x * n - sum < tot) continue;
-        ans = i;
+};
+//工厂模式
+class OperatorSimpleFactory {
+public:
+    Operator* createOperator(std::string oper) {
+        Operator* p = nullptr;
+        if (oper == "+") p = new Add();
+        if (oper == "-") p = new Sub();
+        if (oper == "*") p = new Mul();
+        if (oper == "/") p = new Div();
+        return p;
     }
-    cout << ans << '\n';
-}
+};
 
-signed main()
+int main() 
 {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(0), std::cout.tie(0);
-    int _ = 1;
-    std::cin >> _;
-    while (_--) {
-        solve();
-    }
+    //执行输入部分
+    int firstNumber = 0, secondNumber = 0;
+    std::string oper;
+    std::cout << "Please input the firstnumber, operation and the secondnumber\n";
+    std::cin >> firstNumber >> oper >> secondNumber;
+
+    //执行运算部分
+    OperatorSimpleFactory fac;
+    Operator* p = fac.createOperator(oper);
+    p->setFirstNumber(firstNumber), p->setSecondNumber(secondNumber);
+    
+    //输出执行结果
+    std::cout << "this is the final result\n";
+    std::cout << p->getFirstNumber() << oper << p->getSecondNumber() << '=' << p->getResult() << '\n';
 }
